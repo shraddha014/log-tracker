@@ -1,0 +1,22 @@
+# Xcode
+.DS_Store
+*/build/*
+*.moved-aside
+*.xcuserstate
+**/*.xcuserdata/
+xcuserdata/
+DerivedData/
+*.hmap
+*.xccheckout
+*.moved-aside
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Personal / Local data
+*.xcuserdatad
+LogTrackerData/

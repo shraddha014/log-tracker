@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:log-tracker}",
+            "name": "Debug test-runner",
+            "target": "test-runner",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug test-runner"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:log-tracker}",
+            "name": "Release test-runner",
+            "target": "test-runner",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release test-runner"
+        }
+    ]
+}

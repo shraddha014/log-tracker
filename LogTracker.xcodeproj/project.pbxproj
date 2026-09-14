@@ -1,0 +1,430 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1001 /* LogTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2001 /* LogTrackerApp.swift */; };
+		1002 /* BreakSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2002 /* BreakSession.swift */; };
+		1003 /* WorkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2003 /* WorkSession.swift */; };
+		1004 /* OfficeLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2004 /* OfficeLocation.swift */; };
+		1005 /* HolidayOrPTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2005 /* HolidayOrPTO.swift */; };
+		1006 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2006 /* UserSettings.swift */; };
+		1007 /* AnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2007 /* AnalyticsEngine.swift */; };
+		1008 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2008 /* StorageManager.swift */; };
+		1009 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2009 /* NotificationManager.swift */; };
+		1010 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010 /* LocationManager.swift */; };
+		1011 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2011 /* AppViewModel.swift */; };
+		1012 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012 /* MainTabView.swift */; };
+		1013 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2013 /* DashboardView.swift */; };
+		1014 /* ManualSessionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2014 /* ManualSessionEditView.swift */; };
+		1015 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2015 /* AnalyticsView.swift */; };
+		1016 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016 /* HistoryView.swift */; };
+		1017 /* LocationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2017 /* LocationsView.swift */; };
+		1018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2018 /* SettingsView.swift */; };
+		1019 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2020 /* OnboardingView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0001 /* LogTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LogTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2001 /* LogTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTrackerApp.swift; sourceTree = "<group>"; };
+		2002 /* BreakSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSession.swift; sourceTree = "<group>"; };
+		2003 /* WorkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkSession.swift; sourceTree = "<group>"; };
+		2004 /* OfficeLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficeLocation.swift; sourceTree = "<group>"; };
+		2005 /* HolidayOrPTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolidayOrPTO.swift; sourceTree = "<group>"; };
+		2006 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		2007 /* AnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEngine.swift; sourceTree = "<group>"; };
+		2008 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		2009 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		2010 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		2011 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		2012 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		2013 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		2014 /* ManualSessionEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualSessionEditView.swift; sourceTree = "<group>"; };
+		2015 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		2016 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		2017 /* LocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsView.swift; sourceTree = "<group>"; };
+		2018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2020 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5001 = {
+			isa = PBXGroup;
+			children = (
+				5002 /* LogTracker */,
+				5008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5002 /* LogTracker */ = {
+			isa = PBXGroup;
+			children = (
+				5003 /* App */,
+				5004 /* Models */,
+				5005 /* Engine */,
+				5006 /* ViewModels */,
+				5007 /* Views */,
+				5009 /* Resources */,
+			);
+			path = LogTracker;
+			sourceTree = "<group>";
+		};
+		5003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				2001 /* LogTrackerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2002 /* BreakSession.swift */,
+				2003 /* WorkSession.swift */,
+				2004 /* OfficeLocation.swift */,
+				2005 /* HolidayOrPTO.swift */,
+				2006 /* UserSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5005 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				2007 /* AnalyticsEngine.swift */,
+				2008 /* StorageManager.swift */,
+				2009 /* NotificationManager.swift */,
+				2010 /* LocationManager.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		5006 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2011 /* AppViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5007 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2012 /* MainTabView.swift */,
+				2013 /* DashboardView.swift */,
+				2014 /* ManualSessionEditView.swift */,
+				2015 /* AnalyticsView.swift */,
+				2016 /* HistoryView.swift */,
+				2017 /* LocationsView.swift */,
+				2018 /* SettingsView.swift */,
+				2020 /* OnboardingView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5008 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0001 /* LogTracker.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5009 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2019 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6001 /* LogTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7001 /* Build configuration list for PBXNativeTarget "LogTracker" */;
+			buildPhases = (
+				3001 /* Sources */,
+				4001 /* Frameworks */,
+				8001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LogTracker;
+			productName = LogTracker;
+			productReference = 0001 /* LogTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					6001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 7002 /* Build configuration list for PBXProject "LogTracker" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5001;
+			productRefGroup = 5008 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6001 /* LogTracker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1001 /* LogTrackerApp.swift in Sources */,
+				1002 /* BreakSession.swift in Sources */,
+				1003 /* WorkSession.swift in Sources */,
+				1004 /* OfficeLocation.swift in Sources */,
+				1005 /* HolidayOrPTO.swift in Sources */,
+				1006 /* UserSettings.swift in Sources */,
+				1007 /* AnalyticsEngine.swift in Sources */,
+				1008 /* StorageManager.swift in Sources */,
+				1009 /* NotificationManager.swift in Sources */,
+				1010 /* LocationManager.swift in Sources */,
+				1011 /* AppViewModel.swift in Sources */,
+				1012 /* MainTabView.swift in Sources */,
+				1013 /* DashboardView.swift in Sources */,
+				1014 /* ManualSessionEditView.swift in Sources */,
+				1015 /* AnalyticsView.swift in Sources */,
+				1016 /* HistoryView.swift in Sources */,
+				1017 /* LocationsView.swift in Sources */,
+				1018 /* SettingsView.swift in Sources */,
+				1019 /* OnboardingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 28N926Z3Q3;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 28N926Z3Q3;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LogTracker/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Office Hours";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shraddha.logtracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LogTracker/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Office Hours";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shraddha.logtracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7001 /* Build configuration list for PBXNativeTarget "LogTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9003 /* Debug */,
+				9004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7002 /* Build configuration list for PBXProject "LogTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9001 /* Debug */,
+				9002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7000 /* Project object */;
+}

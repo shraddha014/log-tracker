@@ -26,6 +26,8 @@
 		1017 /* LocationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2017 /* LocationsView.swift */; };
 		1018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2018 /* SettingsView.swift */; };
 		1019 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2020 /* OnboardingView.swift */; };
+		1020 /* LocationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2021 /* LocationSearchService.swift */; };
+		1021 /* InteractiveGeofenceMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2022 /* InteractiveGeofenceMapView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 		2018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2020 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		2021 /* LocationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchService.swift; sourceTree = "<group>"; };
+		2022 /* InteractiveGeofenceMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveGeofenceMapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +115,7 @@
 				2008 /* StorageManager.swift */,
 				2009 /* NotificationManager.swift */,
 				2010 /* LocationManager.swift */,
+				2021 /* LocationSearchService.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -134,6 +139,7 @@
 				2017 /* LocationsView.swift */,
 				2018 /* SettingsView.swift */,
 				2020 /* OnboardingView.swift */,
+				2022 /* InteractiveGeofenceMapView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -241,6 +247,8 @@
 				1017 /* LocationsView.swift in Sources */,
 				1018 /* SettingsView.swift in Sources */,
 				1019 /* OnboardingView.swift in Sources */,
+				1020 /* LocationSearchService.swift in Sources */,
+				1021 /* InteractiveGeofenceMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

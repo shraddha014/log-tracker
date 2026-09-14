@@ -130,7 +130,7 @@ public struct AddOfficeLocationSheet: View {
     @State private var isSatellite: Bool = false
     @State private var showingSearchResults: Bool = false
     
-    private let presetRadii: [Double] = [100, 150, 250, 400, 600]
+    private let presetRadii: [Double] = [25, 50, 100, 200, 400]
     
     public var body: some View {
         NavigationStack {
@@ -283,7 +283,7 @@ public struct AddOfficeLocationSheet: View {
                             .foregroundColor(.blue)
                     }
                     
-                    Slider(value: $radiusMeters, in: 50...1000, step: 25)
+                    Slider(value: $radiusMeters, in: 15...1000, step: 5)
                     
                     // Quick Preset Chips
                     HStack(spacing: 8) {
@@ -300,6 +300,17 @@ public struct AddOfficeLocationSheet: View {
                                     .cornerRadius(6)
                             }
                         }
+                    }
+                    
+                    if radiusMeters < 50 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.orange)
+                            Text("Radii under 50m may be affected by indoor GPS drift.")
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
+                        .padding(.top, 2)
                     }
                 }
                 

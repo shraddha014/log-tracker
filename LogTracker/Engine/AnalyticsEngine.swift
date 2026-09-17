@@ -84,59 +84,72 @@ public struct AnalyticsEngine: Sendable {
     
     public init(calendar: Calendar = .current) {
         var cal = calendar
-        cal.firstWeekday = 2
+        cal.firstWeekday = 2 // Monday is first weekday
         self.calendar = cal
     }
     
-    public func trailingWindow(weeks: Int = 8, referenceDate: Date = Date()) -> (start: Date, end: Date) {
-        let startOfToday = calendar.startOfDay(for: referenceDate)
-        let currentWeekday = calendar.component(.weekday, from: startOfToday)
-        let daysSinceMonday = (currentWeekday + 5) % 7
-        
-        guard let currentWeekMonday = calendar.date(byAdding: .day, value: -daysSinceMonday, to: startOfToday),
-              let windowStartMonday = calendar.date(byAdding: .weekOfYear, value: -(weeks - 1), to: currentWeekMonday),
-              let endOfCurrentWeek = calendar.date(byAdding: .day, value: 7, to: currentWeekMonday) else {
-            return (startOfToday, startOfToday)
-        }
-        
-        return (windowStartMonday, endOfCurrentWeek)
-    }
-    
-    public func allWeekdaysInWindow(startDate: Date, endDate: Date) -> [Date] {
+    /// Returns the rolling list of working days (Monday–Friday) ending on referenceDate (Today).
+    /// If referenceDate is a weekday, it includes today plus the prior (count - 1) weekdays.
+    /// If referenceDate is a weekend (Sat/Sun), it collects the most recent `count` weekdays ending on Friday.
+    /// This strictly prevents future unworked days of the current week from counting as 0.0 hours.
+    public func trailingWeekdays(count: Int = 40, referenceDate: Date = Date()) -> [Date] {
         var weekdays: [Date] = []
-        var currentDate = calendar.startOfDay(for: startDate)
-        let end = calendar.startOfDay(for: endDate)
+        var currentDate = calendar.startOfDay(for: referenceDate)
         
-        while currentDate < end {
+        while weekdays.count < count {
             let weekday = calendar.component(.weekday, from: currentDate)
+            // 1 = Sunday, 7 = Saturday
             if weekday != 1 && weekday != 7 {
                 weekdays.append(currentDate)
             }
-            guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else { break }
-            currentDate = nextDate
+            guard let prevDate = calendar.date(byAdding: .day, value: -1, to: currentDate) else { break }
+            currentDate = prevDate
         }
-        return weekdays
+        
+        // Return sorted chronologically (oldest to newest)
+        return weekdays.reversed()
     }
     
+    /// Main calculation for the trailing average with PTO/Holiday exclusion.
+    /// Accurately spans today + the previous 39 working days (40 workdays total).
     public func calculateTrailingAverage(
         sessions: [WorkSession],
         holidaysAndPTO: [HolidayOrPTO],
         settings: UserSettings = UserSettings(),
         referenceDate: Date = Date()
     ) -> TrailingAverageResult {
-        let (windowStart, windowEnd) = trailingWindow(weeks: settings.trailingWeeksCount, referenceDate: referenceDate)
-        let weekdays = allWeekdaysInWindow(startDate: windowStart, endDate: windowEnd)
+        let totalRequiredDays = settings.trailingWeeksCount * 5 // Typically 8 * 5 = 40 weekdays
+        let weekdays = trailingWeekdays(count: totalRequiredDays, referenceDate: referenceDate)
         let totalStandardWeekdays = weekdays.count
         
+        guard let windowStart = weekdays.first,
+              let windowLastDay = weekdays.last,
+              let windowEnd = calendar.date(byAdding: .day, value: 1, to: windowLastDay) else {
+            return TrailingAverageResult(
+                trailingAverage: 0,
+                totalNetHours: 0,
+                standardWorkdaysCount: 0,
+                ptoHolidayDeductions: 0,
+                effectiveWorkdays: 1,
+                targetHoursPerDay: settings.targetHoursPerDay,
+                warningHoursPerDay: settings.warningHoursPerDay
+            )
+        }
+        
+        let weekdaySet = Set(weekdays)
+        
+        // Set of PTO/Holiday dates matching any weekday in this 40-workday window
         let holidayDates = Set(holidaysAndPTO.map { calendar.startOfDay(for: $0.date) })
         let ptoWeekdaysCount = weekdays.filter { holidayDates.contains($0) }.count
         let effectiveWorkdays = max(1, totalStandardWeekdays - ptoWeekdaysCount)
         
+        // Filter sessions that belong to the weekdays in this rolling 40-workday window
         let windowSessions = sessions.filter { session in
             let sessionDate = session.dayDate(calendar: calendar)
-            return sessionDate >= windowStart && sessionDate < windowEnd
+            return weekdaySet.contains(sessionDate) && sessionDate >= windowStart && sessionDate < windowEnd
         }
         
+        // Sum net office hours
         let totalNetHours = windowSessions.reduce(0.0) { total, session in
             total + session.netWorkHours(at: referenceDate)
         }
@@ -154,13 +167,14 @@ public struct AnalyticsEngine: Sendable {
         )
     }
     
+    /// Generates daily summaries for each day in the rolling window (for charts & lists)
     public func generateDailySummaries(
         sessions: [WorkSession],
         holidaysAndPTO: [HolidayOrPTO],
         weeks: Int = 8,
         referenceDate: Date = Date()
     ) -> [DailyHoursSummary] {
-        let (windowStart, windowEnd) = trailingWindow(weeks: weeks, referenceDate: referenceDate)
+        let weekdays = trailingWeekdays(count: weeks * 5, referenceDate: referenceDate)
         var summaries: [DailyHoursSummary] = []
         
         let ptoMap = Dictionary(
@@ -171,14 +185,8 @@ public struct AnalyticsEngine: Sendable {
             calendar.startOfDay(for: session.clockInTime)
         }
         
-        var currentDate = calendar.startOfDay(for: windowStart)
-        let end = calendar.startOfDay(for: windowEnd)
-        
-        while currentDate < end {
-            let weekday = calendar.component(.weekday, from: currentDate)
-            let isWeekday = (weekday != 1 && weekday != 7)
+        for currentDate in weekdays {
             let pto = ptoMap[currentDate]
-            
             let daySessions = sessionsByDay[currentDate] ?? []
             let gross = daySessions.reduce(0.0) { $0 + ($1.grossDuration(at: referenceDate) / 3600.0) }
             let breaks = daySessions.reduce(0.0) { $0 + ($1.totalBreakDuration(at: referenceDate) / 3600.0) }
@@ -189,31 +197,29 @@ public struct AnalyticsEngine: Sendable {
                 netHours: net,
                 grossHours: gross,
                 breakHours: breaks,
-                isWeekday: isWeekday,
+                isWeekday: true,
                 isPtoOrHoliday: pto != nil,
                 ptoTitle: pto?.title
             ))
-            
-            guard let next = calendar.date(byAdding: .day, value: 1, to: currentDate) else { break }
-            currentDate = next
         }
         
         return summaries
     }
     
+    /// Generates past 40-workday baseline sessions from a user-supplied target daily average.
+    /// Spans today + the 39 prior weekdays so the user's initial average exactly matches their input.
     public func generateBaselineSessions(
         averageHours: Double,
         referenceDate: Date = Date()
     ) -> [WorkSession] {
         guard averageHours > 0 else { return [] }
-        let (windowStart, windowEnd) = trailingWindow(weeks: 8, referenceDate: referenceDate)
-        let weekdays = allWeekdaysInWindow(startDate: windowStart, endDate: windowEnd)
+        let weekdays = trailingWeekdays(count: 40, referenceDate: referenceDate)
         
         var sessions: [WorkSession] = []
         let secondsPerDay = averageHours * 3600.0
         
         for weekday in weekdays {
-            let clockIn = weekday.addingTimeInterval(3600 * 9)
+            let clockIn = weekday.addingTimeInterval(3600 * 9) // 9:00 AM
             let clockOut = clockIn.addingTimeInterval(secondsPerDay)
             
             let session = WorkSession(

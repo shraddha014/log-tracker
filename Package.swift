@@ -28,7 +28,8 @@ let package = Package(
                 "ViewModels",
                 "Resources",
                 "Engine/NotificationManager.swift",
-                "Engine/LocationManager.swift"
+                "Engine/LocationManager.swift",
+                "Engine/LocationSearchService.swift"
             ],
             sources: [
                 "Models/BreakSession.swift",

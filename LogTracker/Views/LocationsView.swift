@@ -76,16 +76,23 @@ public struct LocationsView: View {
             ForEach(viewModel.locations) { loc in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Image(systemName: "building.2.crop.circle.fill")
+                        Image(systemName: loc.isPolygon ? "square.dashed.inset.filled" : "building.2.crop.circle.fill")
                             .font(.title2)
-                            .foregroundColor(.blue)
+                            .foregroundColor(loc.isPolygon ? .indigo : .blue)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text(loc.name)
                                 .font(.headline)
-                            Text("Radius: \(Int(loc.radiusMeters)) meters")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            
+                            if loc.isPolygon {
+                                Text("Custom Painted Shape (\(loc.polygonCoordinates.count) corner points)")
+                                    .font(.caption)
+                                    .foregroundColor(.indigo)
+                            } else {
+                                Text("Radius: \(Int(loc.radiusMeters)) meters")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
                         Spacer()
@@ -126,8 +133,10 @@ public struct AddOfficeLocationSheet: View {
     
     @State private var name: String = ""
     @State private var coordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
-    @State private var radiusMeters: Double = 200.0
-    @State private var isSatellite: Bool = false
+    @State private var radiusMeters: Double = 150.0
+    @State private var polygonPoints: [CoordinatePoint] = []
+    @State private var shapeMode: GeofenceShapeMode = .polygon
+    @State private var isSatellite: Bool = true // Default to satellite so roofs/buildings are visible
     @State private var showingSearchResults: Bool = false
     
     private let presetRadii: [Double] = [25, 50, 100, 200, 400]
@@ -138,7 +147,17 @@ public struct AddOfficeLocationSheet: View {
                 // 1. Search Bar
                 searchHeader
                 
-                // 2. Autocomplete Dropdown or Interactive Map
+                // 2. Mode Selector: Draw Area vs Circle
+                Picker("Boundary Type", selection: $shapeMode) {
+                    ForEach(GeofenceShapeMode.allCases) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.vertical, 6)
+                
+                // 3. Autocomplete Dropdown or Interactive Map
                 if showingSearchResults && !searchService.searchResults.isEmpty {
                     searchResultsList
                 } else {
@@ -156,7 +175,7 @@ public struct AddOfficeLocationSheet: View {
                         saveLocation()
                         dismiss()
                     }
-                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || (shapeMode == .polygon && polygonPoints.count < 3))
                 }
             }
             .onAppear {
@@ -197,7 +216,7 @@ public struct AddOfficeLocationSheet: View {
             .background(Color(.systemGray6))
             .cornerRadius(10)
             .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.vertical, 6)
         }
         .background(Color(.systemBackground))
     }
@@ -227,15 +246,17 @@ public struct AddOfficeLocationSheet: View {
     
     private var mapAndControlsView: some View {
         VStack(spacing: 0) {
-            // Interactive Map with Pin and Geofence Circle
+            // Interactive Map
             ZStack(alignment: .topTrailing) {
                 InteractiveGeofenceMapView(
                     coordinate: $coordinate,
                     radiusMeters: $radiusMeters,
+                    polygonPoints: $polygonPoints,
+                    shapeMode: shapeMode,
                     isSatellite: isSatellite
                 )
                 
-                // Overlay controls (Satellite toggle & Current location)
+                // Map control buttons
                 VStack(spacing: 10) {
                     Button {
                         isSatellite.toggle()
@@ -261,65 +282,116 @@ public struct AddOfficeLocationSheet: View {
             }
             .frame(maxHeight: .infinity)
             
-            // Configuration Drawer
-            VStack(alignment: .leading, spacing: 14) {
+            // Bottom Configuration Drawer
+            VStack(alignment: .leading, spacing: 12) {
                 // Name Input
                 HStack {
                     Text("Name:")
                         .font(.subheadline.bold())
                         .foregroundColor(.secondary)
-                    TextField("e.g. Headquarters, Downtown Campus", text: $name)
+                    TextField("e.g. Headquarters, Building A", text: $name)
                         .textFieldStyle(.roundedBorder)
                 }
                 
-                // Radius Slider and Visual Readout
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text("Geofence Area Radius")
-                            .font(.subheadline.bold())
-                        Spacer()
-                        Text("\(Int(radiusMeters)) meters")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                    }
-                    
-                    Slider(value: $radiusMeters, in: 15...1000, step: 5)
-                    
-                    // Quick Preset Chips
-                    HStack(spacing: 8) {
-                        ForEach(presetRadii, id: \.self) { r in
+                if shapeMode == .polygon {
+                    // Polygon Controls
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Drawn Area:")
+                                .font(.subheadline.bold())
+                            
+                            if polygonPoints.count >= 3 {
+                                Text("\(polygonPoints.count) corners defined (Shape ready)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.green)
+                            } else {
+                                Text("Tap \(3 - polygonPoints.count) more point\(3 - polygonPoints.count == 1 ? "" : "s") to form a shape")
+                                    .font(.subheadline)
+                                    .foregroundColor(.orange)
+                            }
+                            
+                            Spacer()
+                        }
+                        
+                        HStack(spacing: 10) {
                             Button {
-                                radiusMeters = r
+                                if !polygonPoints.isEmpty {
+                                    polygonPoints.removeLast()
+                                }
                             } label: {
-                                Text("\(Int(r))m")
+                                Label("Undo", systemImage: "arrow.uturn.backward")
                                     .font(.caption.bold())
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                    .background(radiusMeters == r ? Color.blue : Color(.systemGray5))
-                                    .foregroundColor(radiusMeters == r ? .white : .primary)
-                                    .cornerRadius(6)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray5))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(8)
+                            }
+                            .disabled(polygonPoints.isEmpty)
+                            
+                            Button {
+                                polygonPoints.removeAll()
+                            } label: {
+                                Label("Clear", systemImage: "trash")
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray5))
+                                    .foregroundColor(.red)
+                                    .cornerRadius(8)
+                            }
+                            .disabled(polygonPoints.isEmpty)
+                        }
+                        
+                        HStack(spacing: 6) {
+                            Image(systemName: "hand.tap.fill")
+                                .foregroundColor(.indigo)
+                            Text("Tap the corners of your office building on the satellite map to trace its exact boundaries.")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                } else {
+                    // Circle Radius Slider
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Geofence Area Radius")
+                                .font(.subheadline.bold())
+                            Spacer()
+                            Text("\(Int(radiusMeters)) meters")
+                                .font(.headline)
+                                .foregroundColor(.blue)
+                        }
+                        
+                        Slider(value: $radiusMeters, in: 15...1000, step: 5)
+                        
+                        HStack(spacing: 8) {
+                            ForEach(presetRadii, id: \.self) { r in
+                                Button {
+                                    radiusMeters = r
+                                } label: {
+                                    Text("\(Int(r))m")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(radiusMeters == r ? Color.blue : Color(.systemGray5))
+                                        .foregroundColor(radiusMeters == r ? .white : .primary)
+                                        .cornerRadius(6)
+                                }
                             }
                         }
-                    }
-                    
-                    if radiusMeters < 50 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.orange)
-                            Text("Radii under 50m may be affected by indoor GPS drift.")
-                                .font(.caption2)
-                                .foregroundColor(.orange)
+                        
+                        if radiusMeters < 50 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(.orange)
+                                Text("Radii under 50m may be affected by indoor GPS drift.")
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
+                            .padding(.top, 2)
                         }
-                        .padding(.top, 2)
                     }
-                }
-                
-                HStack(spacing: 6) {
-                    Image(systemName: "hand.tap.fill")
-                        .foregroundColor(.secondary)
-                    Text("Tap anywhere on the map to reposition the pin center.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
             }
             .padding()
@@ -338,6 +410,11 @@ public struct AddOfficeLocationSheet: View {
                 self.name = title
                 self.searchService.searchQuery = ""
                 self.showingSearchResults = false
+                
+                // If in polygon mode, seed the first point around the resolved place
+                if self.shapeMode == .polygon && self.polygonPoints.isEmpty {
+                    self.polygonPoints.append(CoordinatePoint(latitude: coord.latitude, longitude: coord.longitude))
+                }
             }
         }
     }
@@ -356,17 +433,24 @@ public struct AddOfficeLocationSheet: View {
             if name.isEmpty {
                 name = "My Office Location"
             }
+            if shapeMode == .polygon {
+                polygonPoints.append(CoordinatePoint(latitude: current.coordinate.latitude, longitude: current.coordinate.longitude))
+            }
         }
     }
     
     private func saveLocation() {
+        let isPoly = (shapeMode == .polygon && polygonPoints.count >= 3)
+        let locCenter = isPoly ? (polygonPoints.first?.coordinate ?? coordinate) : coordinate
+        
         let newLocation = OfficeLocation(
             id: UUID(),
-            name: name.isEmpty ? "Office (\(String(format: "%.3f", coordinate.latitude)), \(String(format: "%.3f", coordinate.longitude)))" : name,
-            latitude: coordinate.latitude,
-            longitude: coordinate.longitude,
+            name: name.isEmpty ? "Office Area" : name,
+            latitude: locCenter.latitude,
+            longitude: locCenter.longitude,
             radiusMeters: radiusMeters,
-            isActive: true
+            isActive: true,
+            polygonCoordinates: isPoly ? polygonPoints : []
         )
         viewModel.addLocation(newLocation)
     }

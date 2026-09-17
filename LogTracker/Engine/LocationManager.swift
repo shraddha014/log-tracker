@@ -52,6 +52,7 @@ public final class LocationManager: NSObject, CLLocationManagerDelegate, Observa
             }
         }
         
+        // Register active regions (iOS hardware monitors up to 20 circular bounding regions)
         for loc in activeLocations.prefix(20) {
             let region = loc.circularRegion
             clManager.startMonitoring(for: region)
@@ -86,6 +87,18 @@ public final class LocationManager: NSObject, CLLocationManagerDelegate, Observa
             return
         }
         
+        // Point-in-Polygon Verification:
+        // If the user drew a custom polygon area, verify they are physically inside the painted polygon,
+        // not merely driving on the highway or standing on the sidewalk outside the building!
+        if office.isPolygon {
+            if let currentLoc = clManager.location {
+                if !office.contains(coordinate: currentLoc.coordinate) {
+                    print("[LocationManager] Inside bounding circle, but outside painted polygon. Ignoring false alarm.")
+                    return
+                }
+            }
+        }
+        
         DispatchQueue.main.async {
             self.onRegionEntered?(office)
         }
@@ -96,6 +109,16 @@ public final class LocationManager: NSObject, CLLocationManagerDelegate, Observa
               let uuid = UUID(uuidString: circularRegion.identifier),
               let office = registeredLocations[uuid] else {
             return
+        }
+        
+        // Point-in-Polygon Verification on exit:
+        if office.isPolygon {
+            if let currentLoc = clManager.location {
+                if office.contains(coordinate: currentLoc.coordinate) {
+                    print("[LocationManager] Boundary triggered but GPS still inside painted polygon. Ignoring false exit.")
+                    return
+                }
+            }
         }
         
         DispatchQueue.main.async {

@@ -138,18 +138,21 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         if result.isBelowTarget {
             content.title = "🚨 Trailing 8-Week Average Critical"
             content.body = String(
-                format: "Your 8-week average is %.2fh/day, below the required %.1fh target! You need %.1fh more hours to recover.",
+                format: "Average is %.2fh/day (target: %.1fh). Need %.1fh to reach target, or %.1fh to reach %.1fh buffer.",
                 result.trailingAverage,
                 result.targetHoursPerDay,
-                result.hoursNeededToReachTarget
+                result.hoursNeededToReachTarget,
+                result.hoursNeededToReachWarning,
+                result.warningHoursPerDay
             )
         } else {
             content.title = "⚠️ Trailing 8-Week Average Warning"
             content.body = String(
-                format: "Your 8-week average is %.2fh/day, slipping below the %.1fh buffer (target: %.1fh). Keep up your hours today!",
+                format: "Average is %.2fh/day (target: %.1fh). Above target, but need %.1fh across window to restore %.1fh buffer.",
                 result.trailingAverage,
-                result.warningHoursPerDay,
-                result.targetHoursPerDay
+                result.targetHoursPerDay,
+                result.hoursNeededToReachWarning,
+                result.warningHoursPerDay
             )
         }
         content.sound = .default

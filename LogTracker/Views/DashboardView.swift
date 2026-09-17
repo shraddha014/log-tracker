@@ -190,7 +190,11 @@ public struct DashboardView: View {
         let targetThreshold = result.targetHoursPerDay
         
         let cardColor: Color = avg >= warningThreshold ? .green : (avg >= targetThreshold ? .orange : .red)
-        let statusBadgeText: String = avg >= warningThreshold ? "Above 4.5h Buffer" : (avg >= targetThreshold ? "Below 4.5h Buffer" : "Below 4.0h Target")
+        let statusBadgeText: String = avg >= warningThreshold 
+            ? String(format: "Above %.1fh Buffer", warningThreshold)
+            : (avg >= targetThreshold 
+                ? String(format: "Below %.1fh Buffer", warningThreshold)
+                : String(format: "Below %.1fh Target", targetThreshold))
         
         return VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -233,14 +237,14 @@ public struct DashboardView: View {
                         .fill(cardColor)
                         .frame(width: progressWidth, height: 12)
                     
-                    // Target marker 4.0h
+                    // Target marker
                     let targetX = (CGFloat(targetThreshold) / 6.0) * geo.size.width
                     Rectangle()
                         .fill(Color.primary.opacity(0.6))
                         .frame(width: 2, height: 16)
                         .offset(x: targetX, y: -2)
                     
-                    // Warning marker 4.5h
+                    // Warning marker
                     let warningX = (CGFloat(warningThreshold) / 6.0) * geo.size.width
                     Rectangle()
                         .fill(Color.orange)
@@ -254,12 +258,12 @@ public struct DashboardView: View {
             HStack {
                 HStack(spacing: 4) {
                     Circle().fill(Color.primary.opacity(0.6)).frame(width: 6, height: 6)
-                    Text("Target: 4.0h")
+                    Text(String(format: "Target: %.1fh", targetThreshold))
                 }
                 Spacer()
                 HStack(spacing: 4) {
                     Circle().fill(Color.orange).frame(width: 6, height: 6)
-                    Text("Buffer: 4.5h")
+                    Text(String(format: "Buffer: %.1fh", warningThreshold))
                 }
                 Spacer()
                 Text("\(result.effectiveWorkdays) workdays in window")
@@ -269,14 +273,31 @@ public struct DashboardView: View {
             .foregroundColor(.secondary)
             
             if result.isBelowWarning {
-                HStack(spacing: 8) {
-                    Image(systemName: result.isBelowTarget ? "exclamationmark.octagon.fill" : "exclamationmark.triangle.fill")
-                        .foregroundColor(cardColor)
-                    Text(result.isBelowTarget
-                         ? String(format: "Need %.1f hrs more over the 8-week window to reach the 4.0h daily average.", result.hoursNeededToReachTarget)
-                         : String(format: "Need %.1f hrs to restore the 4.5h/day buffer.", result.hoursNeededToReachWarning))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    if result.isBelowTarget {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.octagon.fill")
+                                .foregroundColor(.red)
+                            Text(String(format: "Target deficit: Need %.1fh across window to reach %.1fh target.", result.hoursNeededToReachTarget, targetThreshold))
+                                .font(.caption.bold())
+                                .foregroundColor(.primary)
+                        }
+                        HStack(spacing: 6) {
+                            Image(systemName: "bell.badge.fill")
+                                .foregroundColor(.orange)
+                            Text(String(format: "Buffer deficit: Need %.1fh across window to reach %.1fh buffer.", result.hoursNeededToReachWarning, warningThreshold))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    } else {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                            Text(String(format: "Above %.1fh target! Need %.1fh across window to reach %.1fh buffer.", targetThreshold, result.hoursNeededToReachWarning, warningThreshold))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
                 .padding(.top, 4)
             }

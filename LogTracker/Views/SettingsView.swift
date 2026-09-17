@@ -49,10 +49,10 @@ public struct SettingsView: View {
                             get: { viewModel.settings.targetHoursPerDay },
                             set: { val in
                                 var updated = viewModel.settings
-                                updated.targetHoursPerDay = val
+                                updated.targetHoursPerDay = (val * 10).rounded() / 10
                                 viewModel.updateSettings(updated)
                             }
-                        ), in: 1.0...12.0, step: 0.5)
+                        ), in: 1.0...12.0, step: 0.1)
                         .labelsHidden()
                     }
                     
@@ -66,10 +66,10 @@ public struct SettingsView: View {
                             get: { viewModel.settings.warningHoursPerDay },
                             set: { val in
                                 var updated = viewModel.settings
-                                updated.warningHoursPerDay = val
+                                updated.warningHoursPerDay = (val * 10).rounded() / 10
                                 viewModel.updateSettings(updated)
                             }
-                        ), in: 1.0...12.0, step: 0.5)
+                        ), in: 1.0...12.0, step: 0.1)
                         .labelsHidden()
                     }
                     

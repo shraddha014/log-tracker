@@ -127,4 +127,35 @@ public struct OfficeLocation: Identifiable, Codable, Equatable, Sendable {
         }
         return inside
     }
+    
+    // MARK: - Codable (Backwards Compatible)
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, latitude, longitude, radiusMeters, isActive, dateCreated, polygonCoordinates
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.latitude = try container.decode(Double.self, forKey: .latitude)
+        self.longitude = try container.decode(Double.self, forKey: .longitude)
+        self.radiusMeters = try container.decode(Double.self, forKey: .radiusMeters)
+        self.isActive = try container.decode(Bool.self, forKey: .isActive)
+        self.dateCreated = try container.decode(Date.self, forKey: .dateCreated)
+        // Backward compatibility: If older saved JSON lacks polygonCoordinates, default to []
+        self.polygonCoordinates = try container.decodeIfPresent([CoordinatePoint].self, forKey: .polygonCoordinates) ?? []
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(latitude, forKey: .latitude)
+        try container.encode(longitude, forKey: .longitude)
+        try container.encode(radiusMeters, forKey: .radiusMeters)
+        try container.encode(isActive, forKey: .isActive)
+        try container.encode(dateCreated, forKey: .dateCreated)
+        try container.encode(polygonCoordinates, forKey: .polygonCoordinates)
+    }
 }

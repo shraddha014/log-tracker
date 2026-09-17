@@ -122,11 +122,11 @@ public struct AnalyticsView: View {
                     }
                     
                     if result.isBelowTarget {
-                        Text(String(format: "You are currently below the required 4.0h/day threshold by %.2fh. You need %.1f additional office hours across this 8-week cycle.", (target - avg), result.hoursNeededToReachTarget))
+                        Text(String(format: "You are currently below the required %.1fh/day target by %.2fh. You need %.1fh additional office hours across this 8-week cycle to reach the minimum target (and %.1fh to reach your %.1fh buffer).", target, (target - avg), result.hoursNeededToReachTarget, result.hoursNeededToReachWarning, warning))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     } else {
-                        Text(String(format: "You are above the 4.0h minimum, but below your 4.5h safety buffer. You need %.1f more hours to reach the 4.5h buffer.", result.hoursNeededToReachWarning))
+                        Text(String(format: "You are above the %.1fh minimum, but below your %.1fh safety buffer. You need %.1f more hours across this 8-week cycle to reach the %.1fh buffer.", target, warning, result.hoursNeededToReachWarning, warning))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }

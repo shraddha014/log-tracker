@@ -200,4 +200,77 @@ do {
     print("  ✅ Passed: Initialized to exactly \(baselineInput)h/day")
 }
 
+// TEST 7: Backward Compatibility for OfficeLocation (Missing polygonCoordinates)
+print("\n[TEST 7] OfficeLocation Backward Compatibility (Older JSON)...")
+do {
+    let legacyJSON = """
+    {
+        "id": "11111111-2222-3333-4444-555555555555",
+        "name": "Legacy Office",
+        "latitude": 37.7749,
+        "longitude": -122.4194,
+        "radiusMeters": 200.0,
+        "isActive": true,
+        "dateCreated": "2023-11-16T12:00:00Z"
+    }
+    """.data(using: .utf8)!
+    
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let decoded = try decoder.decode(OfficeLocation.self, from: legacyJSON)
+    assertEqual(decoded.name, "Legacy Office")
+    assertEqual(decoded.polygonCoordinates.isEmpty, true)
+    assertEqual(decoded.isPolygon, false)
+    print("  ✅ Passed: Older JSON without polygonCoordinates decoded gracefully with no errors!")
+}
+
+// TEST 8: Granular 0.1h Target/Warning Buffers (e.g., 4.3h) & Deficit Verification
+print("\n[TEST 8] Granular 0.1h Thresholds & Deficit Verification (4.0h Target, 4.3h Buffer)...")
+do {
+    let engine = AnalyticsEngine()
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.firstWeekday = 2
+    let refDate = calendar.date(from: DateComponents(year: 2023, month: 11, day: 16))!
+    let weekdays = engine.trailingWeekdays(count: 20, referenceDate: refDate)
+    
+    // Total 74.8 hours across 20 days (average = 3.74h)
+    // 19 days at 3.74h + 1 day at 3.74h
+    var sessions: [WorkSession] = []
+    let totalTargetHours = 74.8
+    let hoursPerDay = totalTargetHours / 20.0
+    for day in weekdays {
+        let session = WorkSession(
+            clockInTime: day.addingTimeInterval(3600 * 9),
+            clockOutTime: day.addingTimeInterval(3600 * (9 + hoursPerDay))
+        )
+        sessions.append(session)
+    }
+    
+    // Test with 4.0h target and 4.5h buffer (4 weeks = 20 weekdays)
+    let result45 = engine.calculateTrailingAverage(
+        sessions: sessions,
+        holidaysAndPTO: [],
+        settings: UserSettings(targetHoursPerDay: 4.0, warningHoursPerDay: 4.5, trailingWeeksCount: 4),
+        referenceDate: refDate
+    )
+    assertDoubleEqual(result45.trailingAverage, 3.74, accuracy: 0.01)
+    assertDoubleEqual(result45.hoursNeededToReachTarget, 5.2, accuracy: 0.01, "Target deficit must be exactly 5.2h")
+    assertDoubleEqual(result45.hoursNeededToReachWarning, 15.2, accuracy: 0.01, "4.5h buffer deficit must be exactly 15.2h")
+    
+    // Test with 4.0h target and user-specified 4.3h warning buffer
+    let result43 = engine.calculateTrailingAverage(
+        sessions: sessions,
+        holidaysAndPTO: [],
+        settings: UserSettings(targetHoursPerDay: 4.0, warningHoursPerDay: 4.3, trailingWeeksCount: 4),
+        referenceDate: refDate
+    )
+    assertDoubleEqual(result43.hoursNeededToReachTarget, 5.2, accuracy: 0.01, "Target deficit remains 5.2h")
+    // (20 * 4.3) - 74.8 = 86.0 - 74.8 = 11.2h
+    assertDoubleEqual(result43.hoursNeededToReachWarning, 11.2, accuracy: 0.01, "4.3h buffer deficit must be exactly 11.2h")
+    assertEqual(result43.isBelowTarget, true)
+    assertEqual(result43.isBelowWarning, true)
+    
+    print("  ✅ Passed: 4.0h target deficit = 5.2h. 4.5h buffer deficit = 15.2h. 4.3h buffer deficit = 11.2h.")
+}
+
 print("\n🎉 ALL LOG TRACKER UNIT TESTS PASSED SUCCESSFULLY! 🎉\n")

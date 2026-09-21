@@ -76,8 +76,17 @@ public struct SettingsView: View {
                     HStack {
                         Text("Trailing Window")
                         Spacer()
-                        Text("\(viewModel.settings.trailingWeeksCount) Weeks (40 Weekdays)")
-                            .foregroundColor(.secondary)
+                        Text("\(viewModel.settings.trailingWeeksCount) Weeks (\(viewModel.settings.trailingWeeksCount * 5) Days)")
+                            .bold()
+                        Stepper("", value: Binding(
+                            get: { viewModel.settings.trailingWeeksCount },
+                            set: { val in
+                                var updated = viewModel.settings
+                                updated.trailingWeeksCount = val
+                                viewModel.updateSettings(updated)
+                            }
+                        ), in: 1...52, step: 1)
+                        .labelsHidden()
                     }
                 }
                 

@@ -49,6 +49,27 @@ public struct TrailingAverageResult: Equatable, Sendable {
     public var effectiveWorkdays: Int
     public var targetHoursPerDay: Double
     public var warningHoursPerDay: Double
+    public var trailingWeeksCount: Int
+    
+    public init(
+        trailingAverage: Double,
+        totalNetHours: Double,
+        standardWorkdaysCount: Int,
+        ptoHolidayDeductions: Int,
+        effectiveWorkdays: Int,
+        targetHoursPerDay: Double,
+        warningHoursPerDay: Double,
+        trailingWeeksCount: Int = 8
+    ) {
+        self.trailingAverage = trailingAverage
+        self.totalNetHours = totalNetHours
+        self.standardWorkdaysCount = standardWorkdaysCount
+        self.ptoHolidayDeductions = ptoHolidayDeductions
+        self.effectiveWorkdays = effectiveWorkdays
+        self.targetHoursPerDay = targetHoursPerDay
+        self.warningHoursPerDay = warningHoursPerDay
+        self.trailingWeeksCount = trailingWeeksCount
+    }
     
     public var isBelowWarning: Bool {
         trailingAverage < warningHoursPerDay
@@ -163,7 +184,8 @@ public struct AnalyticsEngine: Sendable {
             ptoHolidayDeductions: ptoWeekdaysCount,
             effectiveWorkdays: effectiveWorkdays,
             targetHoursPerDay: settings.targetHoursPerDay,
-            warningHoursPerDay: settings.warningHoursPerDay
+            warningHoursPerDay: settings.warningHoursPerDay,
+            trailingWeeksCount: settings.trailingWeeksCount
         )
     }
     
@@ -206,14 +228,15 @@ public struct AnalyticsEngine: Sendable {
         return summaries
     }
     
-    /// Generates past 40-workday baseline sessions from a user-supplied target daily average.
-    /// Spans today + the 39 prior weekdays so the user's initial average exactly matches their input.
+    /// Generates past baseline sessions for the configured trailing window from a user-supplied target daily average.
+    /// Spans today + the prior weekdays so the user's initial average exactly matches their input.
     public func generateBaselineSessions(
         averageHours: Double,
+        weeks: Int = 8,
         referenceDate: Date = Date()
     ) -> [WorkSession] {
         guard averageHours > 0 else { return [] }
-        let weekdays = trailingWeekdays(count: 40, referenceDate: referenceDate)
+        let weekdays = trailingWeekdays(count: weeks * 5, referenceDate: referenceDate)
         
         var sessions: [WorkSession] = []
         let secondsPerDay = averageHours * 3600.0

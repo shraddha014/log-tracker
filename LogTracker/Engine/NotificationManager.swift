@@ -136,7 +136,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
         
         let content = UNMutableNotificationContent()
         if result.isBelowTarget {
-            content.title = "🚨 Trailing 8-Week Average Critical"
+            content.title = "🚨 Trailing \(result.trailingWeeksCount)-Week Average Critical"
             content.body = String(
                 format: "Average is %.2fh/day (target: %.1fh). Need %.1fh to reach target, or %.1fh to reach %.1fh buffer.",
                 result.trailingAverage,
@@ -146,7 +146,7 @@ public final class NotificationManager: NSObject, UNUserNotificationCenterDelega
                 result.warningHoursPerDay
             )
         } else {
-            content.title = "⚠️ Trailing 8-Week Average Warning"
+            content.title = "⚠️ Trailing \(result.trailingWeeksCount)-Week Average Warning"
             content.body = String(
                 format: "Average is %.2fh/day (target: %.1fh). Above target, but need %.1fh across window to restore %.1fh buffer.",
                 result.trailingAverage,

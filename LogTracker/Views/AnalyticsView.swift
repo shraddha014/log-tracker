@@ -26,7 +26,7 @@ public struct AnalyticsView: View {
                 .padding(.horizontal)
                 .padding(.top, 10)
             }
-            .navigationTitle("8-Week Analytics")
+            .navigationTitle("\(viewModel.settings.trailingWeeksCount)-Week Analytics")
         }
     }
     
@@ -43,7 +43,7 @@ public struct AnalyticsView: View {
         return VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Trailing 8-Week Daily Average")
+                    Text("Trailing \(viewModel.settings.trailingWeeksCount)-Week Daily Average")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     
@@ -122,11 +122,11 @@ public struct AnalyticsView: View {
                     }
                     
                     if result.isBelowTarget {
-                        Text(String(format: "You are currently below the required %.1fh/day target by %.2fh. You need %.1fh additional office hours across this 8-week cycle to reach the minimum target (and %.1fh to reach your %.1fh buffer).", target, (target - avg), result.hoursNeededToReachTarget, result.hoursNeededToReachWarning, warning))
+                        Text(String(format: "You are currently below the required %.1fh/day target by %.2fh. You need %.1fh additional office hours across this %d-week cycle to reach the minimum target (and %.1fh to reach your %.1fh buffer).", target, (target - avg), result.hoursNeededToReachTarget, viewModel.settings.trailingWeeksCount, result.hoursNeededToReachWarning, warning))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     } else {
-                        Text(String(format: "You are above the %.1fh minimum, but below your %.1fh safety buffer. You need %.1f more hours across this 8-week cycle to reach the %.1fh buffer.", target, warning, result.hoursNeededToReachWarning, warning))
+                        Text(String(format: "You are above the %.1fh minimum, but below your %.1fh safety buffer. You need %.1f more hours across this %d-week cycle to reach the %.1fh buffer.", target, warning, result.hoursNeededToReachWarning, viewModel.settings.trailingWeeksCount, warning))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -151,7 +151,7 @@ public struct AnalyticsView: View {
             metricTile(
                 title: "Standard Weekdays",
                 value: "\(result.standardWorkdaysCount)",
-                subtitle: "8 weeks × 5 days = 40",
+                subtitle: "\(viewModel.settings.trailingWeeksCount) weeks × 5 days = \(result.standardWorkdaysCount)",
                 icon: "calendar",
                 color: .blue
             )
@@ -207,10 +207,10 @@ public struct AnalyticsView: View {
     // MARK: - Weekly Trend Section
     
     private var weeklyTrendSection: some View {
-        let summaries = viewModel.getDailySummaries(weeks: 8)
+        let summaries = viewModel.getDailySummaries(weeks: viewModel.settings.trailingWeeksCount)
         let calendar = Calendar.current
         
-        // Group daily summaries into 8 weeks
+        // Group daily summaries into configured weeks
         let grouped = Dictionary(grouping: summaries) { summary in
             calendar.component(.weekOfYear, from: summary.date)
         }
@@ -218,7 +218,7 @@ public struct AnalyticsView: View {
         let sortedWeekKeys = grouped.keys.sorted()
         
         return VStack(alignment: .leading, spacing: 12) {
-            Text("Weekly Progression (Past 8 Weeks)")
+            Text("Weekly Progression (Past \(viewModel.settings.trailingWeeksCount) Weeks)")
                 .font(.headline)
             
             VStack(spacing: 8) {

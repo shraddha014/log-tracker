@@ -199,7 +199,7 @@ public struct DashboardView: View {
         return VStack(alignment: .leading, spacing: 14) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Trailing 8-Week Average")
+                    Text("Trailing \(viewModel.settings.trailingWeeksCount)-Week Average")
                         .font(.subheadline.bold())
                         .foregroundColor(.secondary)
                     

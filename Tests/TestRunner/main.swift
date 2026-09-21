@@ -273,4 +273,41 @@ do {
     print("  ✅ Passed: 4.0h target deficit = 5.2h. 4.5h buffer deficit = 15.2h. 4.3h buffer deficit = 11.2h.")
 }
 
+// TEST 9: Configurable Trailing Window Duration (2, 4, 12 weeks)
+print("\n[TEST 9] Configurable Trailing Window Duration (2 Weeks, 4 Weeks, 12 Weeks)...")
+do {
+    let engine = AnalyticsEngine()
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.firstWeekday = 2
+    let refDate = calendar.date(from: DateComponents(year: 2023, month: 11, day: 16))!
+    
+    // 2 weeks = 10 weekdays
+    let settings2w = UserSettings(trailingWeeksCount: 2)
+    let result2w = engine.calculateTrailingAverage(
+        sessions: [],
+        holidaysAndPTO: [],
+        settings: settings2w,
+        referenceDate: refDate
+    )
+    assertEqual(result2w.standardWorkdaysCount, 10, "2-week window must have 10 standard workdays")
+    assertEqual(result2w.trailingWeeksCount, 2, "Trailing weeks count must be 2")
+    
+    // 12 weeks = 60 weekdays
+    let settings12w = UserSettings(trailingWeeksCount: 12)
+    let result12w = engine.calculateTrailingAverage(
+        sessions: [],
+        holidaysAndPTO: [],
+        settings: settings12w,
+        referenceDate: refDate
+    )
+    assertEqual(result12w.standardWorkdaysCount, 60, "12-week window must have 60 standard workdays")
+    assertEqual(result12w.trailingWeeksCount, 12, "Trailing weeks count must be 12")
+    
+    // Baseline generation with custom weeks (e.g., 6 weeks = 30 sessions)
+    let baseline6w = engine.generateBaselineSessions(averageHours: 4.5, weeks: 6, referenceDate: refDate)
+    assertEqual(baseline6w.count, 30, "6-week baseline must generate exactly 30 sessions")
+    
+    print("  ✅ Passed: 2-week window=10 days, 12-week window=60 days, 6-week baseline=30 sessions.")
+}
+
 print("\n🎉 ALL LOG TRACKER UNIT TESTS PASSED SUCCESSFULLY! 🎉\n")

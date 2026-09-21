@@ -269,8 +269,8 @@ public final class AppViewModel: ObservableObject {
         updatedSettings.initialBaselineAverage = initialAverage
         
         if let avg = initialAverage, avg > 0 {
-            let baselineSessions = analyticsEngine.generateBaselineSessions(averageHours: avg)
-            // Backfill initial past 8-week data so user starts with their real-world average
+            let baselineSessions = analyticsEngine.generateBaselineSessions(averageHours: avg, weeks: settings.trailingWeeksCount)
+            // Backfill initial past data so user starts with their real-world average
             if self.sessions.isEmpty {
                 self.sessions = baselineSessions
                 storage.saveWorkSessions(self.sessions)
@@ -300,11 +300,11 @@ public final class AppViewModel: ObservableObject {
         )
     }
     
-    public func getDailySummaries(weeks: Int = 8) -> [DailyHoursSummary] {
+    public func getDailySummaries(weeks: Int? = nil) -> [DailyHoursSummary] {
         analyticsEngine.generateDailySummaries(
             sessions: sessions,
             holidaysAndPTO: holidaysAndPTO,
-            weeks: weeks,
+            weeks: weeks ?? settings.trailingWeeksCount,
             referenceDate: Date()
         )
     }

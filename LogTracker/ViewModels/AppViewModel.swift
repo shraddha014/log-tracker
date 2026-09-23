@@ -43,10 +43,14 @@ public final class AppViewModel: ObservableObject {
             settings: loadedSettings
         )
         
+        // Phase 1 complete: all stored properties initialized. Safe to prune.
+        pruneOutOfWindowData(saveToDisk: true)
+        
         setupTimer()
         setupLocationCallbacks()
         setupNotificationCallbacks()
         syncGeofences()
+        storage.cleanupStaleExportFiles()
     }
     
     // MARK: - Live Timer Ticker
@@ -153,6 +157,7 @@ public final class AppViewModel: ObservableObject {
         
         activeSession = nil
         persistSessions()
+        pruneOutOfWindowData(saveToDisk: true)
         recalculateTrailingAverage()
         
         // Check if trailing average triggers a notification
@@ -284,9 +289,46 @@ public final class AppViewModel: ObservableObject {
     // MARK: - Settings
     
     public func updateSettings(_ newSettings: UserSettings) {
+        let windowChanged = newSettings.trailingWeeksCount != self.settings.trailingWeeksCount
         self.settings = newSettings
         storage.saveSettings(newSettings)
+        if windowChanged {
+            pruneOutOfWindowData(saveToDisk: true)
+        }
         recalculateTrailingAverage()
+    }
+    
+    // MARK: - Data Retention & Pruning
+    
+    @discardableResult
+    public func pruneOutOfWindowData(saveToDisk: Bool = true) -> Int {
+        let initialCount = sessions.count + holidaysAndPTO.count
+        
+        let prunedSessions = analyticsEngine.pruneSessions(
+            sessions: sessions,
+            weeks: settings.trailingWeeksCount,
+            referenceDate: Date()
+        )
+        let prunedHolidays = analyticsEngine.pruneHolidays(
+            holidaysAndPTO: holidaysAndPTO,
+            weeks: settings.trailingWeeksCount,
+            referenceDate: Date()
+        )
+        
+        let removedCount = initialCount - (prunedSessions.count + prunedHolidays.count)
+        
+        if removedCount > 0 || saveToDisk {
+            self.sessions = prunedSessions
+            self.holidaysAndPTO = prunedHolidays
+            
+            if saveToDisk {
+                persistSessions()
+                storage.saveHolidaysAndPTO(prunedHolidays)
+                recalculateTrailingAverage()
+            }
+        }
+        
+        return removedCount
     }
     
     // MARK: - Calculations & Exports

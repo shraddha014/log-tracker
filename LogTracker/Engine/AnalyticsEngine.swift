@@ -131,6 +131,39 @@ public struct AnalyticsEngine: Sendable {
         return weekdays.reversed()
     }
     
+    /// Returns the earliest date (start of day) of the configured trailing window.
+    /// Any sessions clocked in before this timestamp are outside the rolling window.
+    public func earliestWindowDate(weeks: Int = 8, referenceDate: Date = Date()) -> Date {
+        let weekdays = trailingWeekdays(count: max(1, weeks * 5), referenceDate: referenceDate)
+        return weekdays.first ?? calendar.startOfDay(for: referenceDate)
+    }
+    
+    /// Filters work sessions, keeping only sessions that fall within the trailing window (or are currently active).
+    /// All sessions older than the window boundary are pruned and discarded.
+    public func pruneSessions(
+        sessions: [WorkSession],
+        weeks: Int = 8,
+        referenceDate: Date = Date()
+    ) -> [WorkSession] {
+        let cutoff = earliestWindowDate(weeks: weeks, referenceDate: referenceDate)
+        return sessions.filter { session in
+            // Always keep active session even if clocked in before cutoff
+            session.isActive || session.clockInTime >= cutoff
+        }
+    }
+    
+    /// Filters holidays and PTO entries, keeping only entries that fall on or after the earliest window date.
+    public func pruneHolidays(
+        holidaysAndPTO: [HolidayOrPTO],
+        weeks: Int = 8,
+        referenceDate: Date = Date()
+    ) -> [HolidayOrPTO] {
+        let cutoff = earliestWindowDate(weeks: weeks, referenceDate: referenceDate)
+        return holidaysAndPTO.filter { pto in
+            calendar.startOfDay(for: pto.date) >= cutoff
+        }
+    }
+    
     /// Main calculation for the trailing average with PTO/Holiday exclusion.
     /// Accurately spans today + the previous 39 working days (40 workdays total).
     public func calculateTrailingAverage(

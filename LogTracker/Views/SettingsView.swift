@@ -5,6 +5,8 @@ public struct SettingsView: View {
     @State private var showingExportShareSheet = false
     @State private var exportedCSVURL: URL?
     @State private var showingTestNotificationAlert = false
+    @State private var showingPruneAlert = false
+    @State private var purgedCount = 0
     
     public init(viewModel: AppViewModel) {
         self.viewModel = viewModel
@@ -147,6 +149,25 @@ public struct SettingsView: View {
                     }
                     
                     HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Data Retention Policy")
+                                .font(.subheadline.bold())
+                            Text("Automatically keeps only the past \(viewModel.settings.trailingWeeksCount) weeks (\(viewModel.settings.trailingWeeksCount * 5) weekdays). Older logs outside this window are deleted.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                    
+                    Button {
+                        let count = viewModel.pruneOutOfWindowData(saveToDisk: true)
+                        purgedCount = count
+                        showingPruneAlert = true
+                    } label: {
+                        Label("Clean Up Older Records Now", systemImage: "trash")
+                    }
+                    
+                    HStack {
                         Image(systemName: "lock.shield.fill")
                             .foregroundColor(.green)
                         VStack(alignment: .leading, spacing: 2) {
@@ -170,6 +191,13 @@ public struct SettingsView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text("Notification permissions requested. Check Settings > Notifications > LogTracker if needed.")
+            }
+            .alert("Data Retention Cleanup", isPresented: $showingPruneAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(purgedCount > 0
+                     ? "Successfully purged \(purgedCount) older record(s) outside your \(viewModel.settings.trailingWeeksCount)-week window."
+                     : "Storage is already clean! All records currently fit within your configured \(viewModel.settings.trailingWeeksCount)-week window.")
             }
         }
     }

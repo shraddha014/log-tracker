@@ -117,4 +117,26 @@ public final class StorageManager: @unchecked Sendable {
         
         return csv
     }
+    
+    // MARK: - Maintenance & Retention Cleanup
+    
+    /// Cleans up any stale temporary export files (e.g. older than 24 hours).
+    public func cleanupStaleExportFiles(maxAgeHours: Double = 24.0) {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            let tempDir = self.fileManager.temporaryDirectory
+            guard let files = try? self.fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else { return }
+            
+            let now = Date()
+            for file in files where file.lastPathComponent.hasPrefix("office_hours_export_") {
+                if let attributes = try? self.fileManager.attributesOfItem(atPath: file.path),
+                   let modDate = attributes[.modificationDate] as? Date {
+                    let age = now.timeIntervalSince(modDate)
+                    if age > (maxAgeHours * 3600.0) {
+                        try? self.fileManager.removeItem(at: file)
+                    }
+                }
+            }
+        }
+    }
 }

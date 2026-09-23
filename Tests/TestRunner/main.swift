@@ -310,4 +310,57 @@ do {
     print("  ✅ Passed: 2-week window=10 days, 12-week window=60 days, 6-week baseline=30 sessions.")
 }
 
+// TEST 10: Automatic Data Retention & Out-of-Window Pruning
+print("\n[TEST 10] Automatic Data Retention & Pruning (Purging Obsolete Records)...")
+do {
+    let engine = AnalyticsEngine()
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.firstWeekday = 2
+    let refDate = calendar.date(from: DateComponents(year: 2023, month: 11, day: 16))!
+    
+    // Generate 16 weeks of daily work sessions (16 * 5 = 80 weekdays)
+    let sixteenWeeks = engine.trailingWeekdays(count: 80, referenceDate: refDate)
+    assertEqual(sixteenWeeks.count, 80, "Must generate 80 weekdays")
+    
+    var allSessions: [WorkSession] = []
+    for day in sixteenWeeks {
+        let session = WorkSession(
+            clockInTime: day.addingTimeInterval(3600 * 9),
+            clockOutTime: day.addingTimeInterval(3600 * 13) // 4.0h
+        )
+        allSessions.append(session)
+    }
+    
+    // Add an active session on an older day to ensure active sessions are never dropped
+    let activeOlderSession = WorkSession(
+        clockInTime: sixteenWeeks[0].addingTimeInterval(3600 * 8),
+        clockOutTime: nil // Active!
+    )
+    allSessions.append(activeOlderSession)
+    
+    // 1. Prune with 8-week window (should retain 40 weekdays + 1 active session = 41 sessions)
+    let pruned8w = engine.pruneSessions(sessions: allSessions, weeks: 8, referenceDate: refDate)
+    assertEqual(pruned8w.count, 41, "8-week retention must retain exactly 40 completed weekdays + 1 active session")
+    assertEqual(pruned8w.contains(where: { $0.id == activeOlderSession.id }), true, "Active session must never be pruned")
+    
+    // Verify all pruned completed sessions are >= earliest 8-week date
+    let earliest8w = engine.earliestWindowDate(weeks: 8, referenceDate: refDate)
+    for s in pruned8w where !s.isActive {
+        assertEqual(s.clockInTime >= earliest8w, true, "Retained session must be within the 8-week window")
+    }
+    
+    // 2. Prune with 4-week window (should retain 20 weekdays + 1 active session = 21 sessions)
+    let pruned4w = engine.pruneSessions(sessions: pruned8w, weeks: 4, referenceDate: refDate)
+    assertEqual(pruned4w.count, 21, "4-week retention must retain exactly 20 completed weekdays + 1 active session")
+    
+    // 3. Prune PTO entries: 1 within window, 1 older than window
+    let ptoRecent = HolidayOrPTO(date: sixteenWeeks[75], type: .pto, title: "Recent PTO")
+    let ptoOld = HolidayOrPTO(date: sixteenWeeks[10], type: .holiday, title: "Old Holiday")
+    let prunedPto = engine.pruneHolidays(holidaysAndPTO: [ptoRecent, ptoOld], weeks: 8, referenceDate: refDate)
+    assertEqual(prunedPto.count, 1, "Must prune 1 old holiday")
+    assertEqual(prunedPto.first?.title, "Recent PTO", "Must keep the PTO within the 8-week window")
+    
+    print("  ✅ Passed: 80 sessions pruned to 40 for 8 weeks, further pruned to 20 for 4 weeks. Old PTO pruned.")
+}
+
 print("\n🎉 ALL LOG TRACKER UNIT TESTS PASSED SUCCESSFULLY! 🎉\n")
